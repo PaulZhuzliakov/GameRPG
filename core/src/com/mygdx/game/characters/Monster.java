@@ -8,24 +8,18 @@ import com.mygdx.game.Weapon;
 
 
 public class Monster extends GameCharacter {
-    private Vector2 direction;
-    private Vector2 temp;
     private float moveTimer;
     private float activityRadius;
-
-    //ссылка на игру для монстра
-    private final static int MONSTER_SIZE_X = 80;
-    private final static int MONSTER_SIZE_Y = 78;
-
-    public float getActivityRadius() {
-        return activityRadius;
-    }
 
     public Monster(GameScreen gameScreen) {
         this.gameScreen = gameScreen;
         texture = new Texture("monster.png");
         textureHp = new Texture("bar.png");
-        position = new Vector2(400, 400);
+
+        position = new Vector2(MathUtils.random(0, 1280), MathUtils.random(0, 720));
+        while (!gameScreen.getMap().isCellPassable(position)) {
+            position = new Vector2(MathUtils.random(0, 1280), MathUtils.random(0, 720));
+        }
         //при запуске никуда не пытается идти
         direction = new Vector2(0, 0);
         temp = new Vector2(0, 0);
@@ -39,34 +33,30 @@ public class Monster extends GameCharacter {
 
     @Override
     public void update(float deltaTime) {
+
         damageEffectTimer -= deltaTime;
         if (damageEffectTimer < 0.0f) {
             damageEffectTimer = 0.0f;
         }
-        //расстояние между монстром и героем
+
+        //dst - расстояние между монстром и героем
         float dst = gameScreen.getHero().getPosition().dst(this.position);
         //если герой в радиусе действия, бежим к герою
         if (dst < activityRadius) {
-            //в temp записываем позицию монстра
-            temp.set(gameScreen.getHero().getPosition());
-            //из вектора монстра вычитаем вектор героя
-            temp.sub(this.position);
-            temp.nor();
-            position.mulAdd(temp, moveSpeed * deltaTime);
-
-        // иначе слоняется без дела
+            //direction смотрит в сторону героя. из вектора монстра вычитаем вектор героя и нормируем
+            direction.set(gameScreen.getHero().getPosition()).sub(this.position).nor();
+            //иначе монстр слоняется без дела
         } else {
-        //сложение векторов. к вектору позиции добавляем вектор направления.
-        //но направление -единичный вектор. поэтому масштабируем вектор направления на велечину скорости
-        position.mulAdd(direction, moveSpeed * deltaTime);
-        moveTimer -= deltaTime;
-        if (moveTimer < 0.0f) {
-            moveTimer = MathUtils.random(3.0f, 4.0f);
-            //генерация вектора направления движения
-            direction.set(MathUtils.random(-1.0f, 1.0f), MathUtils.random(-1.0f, 1.0f));
-            //нормирование вектора. вектор должен быть равен 1
-            direction.nor();
-        }}
+            moveTimer -= deltaTime;
+            if (moveTimer < 0.0f) {
+                moveTimer = MathUtils.random(3.0f, 4.0f);
+                //генерация вектора направления движения. и нормирование вектора. вектор должен быть равен 1
+                direction.set(MathUtils.random(-1.0f, 1.0f), MathUtils.random(-1.0f, 1.0f)).nor();
+            }
+        }
+
+        moveGameCharacter(deltaTime);
+
         if (dst < weapon.getAttackRadius()) {
             attackTimer += deltaTime;
             if (attackTimer >= weapon.getAttackPeriod()) {
