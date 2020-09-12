@@ -49,7 +49,7 @@ public class Item {
     //стандартная структура переиспользуемых объектов
     public void setUpItem(float x, float y, Type type) {
         this.position.set(x, y);
-        this.position.set(MathUtils.random(-50, 50), MathUtils.random(-50, 50));
+        this.velocity.set(MathUtils.random(-50, 50), MathUtils.random(-50, 50));
         this.type = type;
         //сбросить время. иначе вновь созданный Item будет закончившимся
         this.time = 0.0f;

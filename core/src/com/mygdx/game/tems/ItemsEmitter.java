@@ -13,6 +13,10 @@ public class ItemsEmitter {
     private Texture texture;
     private TextureRegion[] regions;
 
+    public Item[] getItems() {
+        return items;
+    }
+
     public ItemsEmitter() {
         //лучше использовать Паттерн пул объектов
         items = new Item[50];
@@ -32,16 +36,17 @@ public class ItemsEmitter {
         }
     }
 
-    public void generateRandomItem(float x, float y) {
-        float chance = 1.0f;
-        float n = MathUtils.random(0.0f, 1.0f);
-        if (n <= chance) {
-            //длинна массива значений enum`а Type
-            int type = MathUtils.random(0, Item.Type.values().length - 1);
-            for (int i = 0; i < items.length; i++) {
-                if (!items[i].isActive()) {
-                    items[i].setUpItem(x, y, Item.Type.values()[type]);
-                    break;
+    public void generateRandomItem(float x, float y, float count, float probability) {
+        for (int q = 0; q < count; q++) {
+            float n = MathUtils.random(0.0f, 1.0f);
+            if (n <= probability) {
+                //длинна массива значений enum`а Type
+                int type = MathUtils.random(0, Item.Type.values().length - 1);
+                for (int i = 0; i < items.length; i++) {
+                    if (!items[i].isActive()) {
+                        items[i].setUpItem(x, y, Item.Type.values()[type]);
+                        break;
+                    }
                 }
             }
         }

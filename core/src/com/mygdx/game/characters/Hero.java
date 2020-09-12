@@ -3,27 +3,69 @@ package com.mygdx.game.characters;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.graphics.g2d.BitmapFont;
+import com.badlogic.gdx.graphics.g2d.Sprite;
+import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector2;
 import com.mygdx.game.GameScreen;
 import com.mygdx.game.Weapon;
+import com.mygdx.game.tems.Item;
 
 public class Hero extends GameCharacter {
+    private int coins;
+    private int level;
+    private int exp;
+    private int[] expTo = {0, 0, 100, 300, 600, 1000, 5000};
 
     public Hero(GameScreen gameScreen) {
         this.gameScreen = gameScreen;
+        this.level = 1;
         texture = new Texture("hero.png");
         textureHp = new Texture("bar.png");
         position = new Vector2(200, 200);
-        temp = new Vector2(0,0);
+        temp = new Vector2(0, 0);
         direction = new Vector2(0, 0);
         hpMax = 100.0f;
         hp = hpMax;
-        moveSpeed = 100.0f;
-        weapon = new Weapon("Sword", 70.0f, 0.5f, 5.0f);
+        moveSpeed = 150.0f;
+        weapon = new Weapon("Sword", 100.0f, 0.5f, 5.0f);
+    }
+
+    public void renderHUD(SpriteBatch batch, BitmapFont font24) {
+        //с помощью font24 нарисовать в batch кол-во монет
+        font24.draw(batch, "Knight: Marina" +
+                "\nlevel: " + level +
+                "\nExp: " + exp + "/" + expTo[level + 1] +
+                "\nCoins: " + coins, 20, 700);
+    }
+
+    public void killMonster(Monster monster) throws ArrayIndexOutOfBoundsException {
+        exp += monster.hpMax * 50;
+        if (exp == expTo[expTo.length - 1]) {
+            level = 1;
+            exp = 0;
+        } else {
+            //если набран максимальный уровень
+            if (exp >= expTo[level + 1]) {
+                exp = 0;
+                level++;
+                hpMax *= 1.1;
+                hp = hpMax;
+            }
+        }
+
     }
 
     @Override
     public void update(float deltaTime) {
+
+        if (hp < hpMax) {
+            hp += deltaTime / 5;
+            if (hp > hpMax) {
+                hp = hpMax;
+            }
+        }
 
         damageEffectTimer -= deltaTime;
         if (damageEffectTimer < 0.0f) {
@@ -70,4 +112,12 @@ public class Hero extends GameCharacter {
         checkScreenBounds();
     }
 
+    public void useItem(Item it) {
+        switch (it.getType()) {
+            case COINS:
+                coins += MathUtils.random(3, 5);
+                break;
+        }
+        it.deactivateItem();
+    }
 }

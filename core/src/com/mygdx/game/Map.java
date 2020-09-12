@@ -19,14 +19,14 @@ public class Map {
         data = new byte[CELLS_X][CELLS_Y];
         // 0 - проходимая ячейка, 1 - непроходимая. надо поменять на enum
         // назначаем стены
-        for (int i = 0; i < 15; i++) {
+        for (int i = 0; i < 5; i++) {
             data[MathUtils.random(0, CELLS_X - 1)][MathUtils.random(0,CELLS_Y - 1)] = 1;
         }
         textureGrass = new Texture("grass.png");
         textureWall = new Texture("wall.png");
     }
 
-    public boolean isCellPassable(Vector2 position) {
+    public boolean isCellPassable(Vector2 position) throws IndexOutOfBoundsException {
         if (position.x < 0.0f || position.x > 1280.0f || position.y < 0.0f || position.y > 720.0f ) {
             return false;
         }
@@ -41,7 +41,7 @@ public class Map {
                 batch.draw(textureGrass, i * 80, j * 80);
                 //ставим стену
                 if (data[i][j] == 1) {
-                    batch.draw(textureWall, i * 80, j * 80);
+                    batch.draw(textureWall, (i * 80)-40, (j * 80)-40);
                 }
             }
         }
