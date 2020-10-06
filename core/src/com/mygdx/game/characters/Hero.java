@@ -4,19 +4,19 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
-import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector2;
 import com.mygdx.game.GameScreen;
 import com.mygdx.game.Weapon;
-import com.mygdx.game.tems.Item;
+import com.mygdx.game.tems.FlyingText;
 
 public class Hero extends GameCharacter {
     private int coins;
     private int level;
     private int exp;
-    private int[] expTo = {0, 0, 100, 300, 600, 1000, 5000};
+    private int[] expTo = new int[20];
+    private String name = "Username";
 
     public Hero(GameScreen gameScreen) {
         this.gameScreen = gameScreen;
@@ -24,7 +24,6 @@ public class Hero extends GameCharacter {
         texture = new Texture("hero.png");
         textureHp = new Texture("bar.png");
         position = new Vector2(200, 200);
-        temp = new Vector2(0, 0);
         direction = new Vector2(0, 0);
         hpMax = 100.0f;
         hp = hpMax;
@@ -33,11 +32,18 @@ public class Hero extends GameCharacter {
     }
 
     public void renderHUD(SpriteBatch batch, BitmapFont font24) {
+            expTo[2] = 1000;
+        for (int i = 3; i < expTo.length; i++) {
+            expTo[i] = expTo[i-1]*2;
+        }
+        stringHelper.setLength(0);
+        stringHelper.append("Knight: ").append(name).append("\n");
+        stringHelper.append("level: ").append(level).append("\n");
+        stringHelper.append("Exp: ").append(exp).append("/").append(expTo[level + 1]).append("\n");
+        stringHelper.append("Coins: ").append(coins);
+
         //с помощью font24 нарисовать в batch кол-во монет
-        font24.draw(batch, "Knight: Marina" +
-                "\nlevel: " + level +
-                "\nExp: " + exp + "/" + expTo[level + 1] +
-                "\nCoins: " + coins, 20, 700);
+        font24.draw(batch, stringHelper, 20, 700);
     }
 
     public void killMonster(Monster monster) throws ArrayIndexOutOfBoundsException {
@@ -112,10 +118,24 @@ public class Hero extends GameCharacter {
         checkScreenBounds();
     }
 
-    public void useItem(Item it) {
+    public void useItem(FlyingText it) {
         switch (it.getType()) {
             case COINS:
-                coins += MathUtils.random(3, 5);
+                int amount = MathUtils.random(3, 5);
+                coins += amount;
+                stringHelper.setLength(0);
+                stringHelper.append("Coins +").append(amount);
+                gameScreen.getTextEmitter().setUpItem(it.getPosition().x, it.getPosition().y, stringHelper);
+                break;
+            case MEDKIT:
+                amount = 5;
+                hp += amount;
+                stringHelper.setLength(0);
+                stringHelper.append("HP +").append(5);
+                gameScreen.getTextEmitter().setUpItem(it.getPosition().x, it.getPosition().y, stringHelper);
+                if (hp > hpMax) {
+                    hp = hpMax;
+                }
                 break;
         }
         it.deactivateItem();

@@ -5,23 +5,20 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.MathUtils;
 
-import java.util.ArrayList;
-import java.util.List;
-
 public class ItemsEmitter {
-    private Item[] items;
+    private FlyingText[] items;
     private Texture texture;
     private TextureRegion[] regions;
 
-    public Item[] getItems() {
+    public FlyingText[] getItems() {
         return items;
     }
 
     public ItemsEmitter() {
         //лучше использовать Паттерн пул объектов
-        items = new Item[50];
+        items = new FlyingText[50];
         for (int i = 0; i < items.length; i++) {
-            items[i] = new Item();
+            items[i] = new FlyingText();
         }
         texture = new Texture("items.png");
         regions = new TextureRegion(texture).split(32, 32)[0];
@@ -41,10 +38,10 @@ public class ItemsEmitter {
             float n = MathUtils.random(0.0f, 1.0f);
             if (n <= probability) {
                 //длинна массива значений enum`а Type
-                int type = MathUtils.random(0, Item.Type.values().length - 1);
+                int type = MathUtils.random(0, FlyingText.Type.values().length - 1);
                 for (int i = 0; i < items.length; i++) {
                     if (!items[i].isActive()) {
-                        items[i].setUpItem(x, y, Item.Type.values()[type]);
+                        items[i].setUpItem(x, y, FlyingText.Type.values()[type]);
                         break;
                     }
                 }

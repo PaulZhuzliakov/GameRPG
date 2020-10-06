@@ -22,7 +22,6 @@ public class Monster extends GameCharacter {
         }
         //при запуске никуда не пытается идти
         direction = new Vector2(0, 0);
-        temp = new Vector2(0, 0);
         moveSpeed = 40.0f;
         activityRadius = 200.0f;
         weapon = new Weapon("Rusty sword", 50.0f, 0.8f, 5.0f);

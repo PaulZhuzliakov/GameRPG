@@ -19,6 +19,12 @@ public abstract class GameCharacter {
     float damageEffectTimer;
     float attackTimer;
     Weapon weapon;
+    StringBuilder stringHelper;
+
+    public GameCharacter() {
+        temp = new Vector2(0,0);
+        stringHelper = new StringBuilder();
+    }
 
     //проверка жив ли персонаж
     public boolean isAlive() {
@@ -45,8 +51,10 @@ public abstract class GameCharacter {
 
         batch.setColor(1, 1, 1, 1);
 
+        stringHelper.setLength(0);
+        stringHelper.append((int)hp);
         //берем шрифт рисуем в батче HP, текст с левой стороны полосы здоровья, вписано в полоску длинной 80, выравнивание по центру, нет переноса по словам
-        font24.draw(batch, String.valueOf((int)hp), position.x-80, position.y+17, 80, 1, false);
+        font24.draw(batch, stringHelper, position.x-80, position.y+17, 80, 1, false);
     }
 
     public abstract void update(float deltaTime);
@@ -76,9 +84,14 @@ public abstract class GameCharacter {
     }
 
     public void moveGameCharacter(float deltaTime) {
-        //в temp записываем текущие координаты. потом двигаемся сложением векторов
-        temp.set(position).mulAdd(direction, moveSpeed * deltaTime);
-        if (gameScreen.getMap().isCellPassable(temp)) {
+        //если клетка свободна, перемещаемся в нее
+        if (gameScreen.getMap().isCellPassable(temp.set(position).mulAdd(direction, moveSpeed * deltaTime))) {
+            position.set(temp);
+            //зануляем позицию по Y. движение только по X
+        } else if ((gameScreen.getMap().isCellPassable(temp.set(position).mulAdd(direction, moveSpeed * deltaTime).set(temp.x, position.y)))) {
+            position.set(temp);
+            //зануляем позицию по X. движение только по Y
+        } else if ((gameScreen.getMap().isCellPassable(temp.set(position).mulAdd(direction, moveSpeed * deltaTime).set(temp.x, position.y)))) {
             position.set(temp);
         }
     }
